@@ -1,5 +1,9 @@
 import express from 'express';
 import routes from './routes';
+import enventLoader from './utils/env';
+
+// Load environment variables
+enventLoader();
 
 // initialize express just like we do for flask
 const app = express();
