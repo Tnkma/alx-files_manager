@@ -1,37 +1,40 @@
-const { MongoClient } = require('mongodb');
-const dotenv = require('dotenv');
+import enventLoader from './env';
 
-// Load environment variables from .env file
-dotenv.config();
+const { MongoClient } = require('mongodb');
 
 class DBClient {
   constructor() {
-    // Set connection options for MongoDB
-    const host = process.env.DB_HOST || 'localhost';
-    const port = process.env.DB_PORT || '27017';
-    const database = process.env.DB_DATABASE || 'files_manager';
-
-    // Set the connection string for MongoDB
-    const url = `mongodb://${host}:${port}`;
-
-    // Create a new MongoClient
-    this.client = new MongoClient(url);
-    this.database = database;
+      enventLoader();
+      // Set connection options for MongoDB
+      const host = process.env.DB_HOST || 'localhost';
+      const port = process.env.DB_PORT || '27017';
+      const database = process.env.DB_DATABASE || 'files_manager';
+  
+      // Set the connection string for MongoDB
+      const url = `mongodb://${host}:${port}/${database}`;
+      // console.log(url);
+  
+      // Create a new MongoClient
+      this.client = new MongoClient(url);
   }
-
-  // Method to initialize the connection
+  
   async connect() {
-    try {
-      await this.client.connect();
-      console.log('Connected successfully to server');
-    } catch (err) {
-      console.error('Error connecting to MongoDB:', err);
-    }
+      try {
+          await this.client.connect(); // Connect asynchronously
+          console.log('Connected to MongoDB');
+      } catch (error) {
+          console.error('Error connecting to MongoDB:', error);
+          throw error; // Re-throw the error to handle it where connect() is called
+      }
   }
 
   // Method to check if the connection is successful
   isAlive() {
-    return this.connected;
+    const status = this.client.connected;
+    if (status) {
+      return true;
+    }
+    return false;
   }
 
   // Method to get the number of users in the database
