@@ -29,12 +29,14 @@ class DBClient {
   }
 
   // Method to check if the connection is successful
-  isAlive() {
-    const status = this.client.connected;
-    if (status) {
+  async isAlive() {
+    try {
+      // Check if the connection is successful
+      await this.client.connected;
       return true;
+    } catch (err) {
+      return false;
     }
-    return false;
   }
 
   // Method to get the number of users in the database
