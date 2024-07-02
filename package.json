@@ -9,41 +9,38 @@
     "start-server": "nodemon --exec babel-node --presets @babel/preset-env ./server.js",
     "start-worker": "nodemon --exec babel-node --presets @babel/preset-env ./worker.js",
     "dev": "nodemon --exec babel-node --presets @babel/preset-env",
-    "test": "./node_modules/.bin/mocha --require @babel/register --exit"
+    "test": "./node_modules/.bin/mocha --require @babel/register --exit" 
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bull": "^4.15.0",
-    "chai-http": "^5.0.0",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "image-thumbnail": "^1.0.15",
-    "mime-types": "^2.1.35",
-    "mongodb": "^6.8.0",
-    "nodejs": "^0.0.0",
-    "redis": "^4.6.14",
-    "sha1": "^1.1.1",
-    "uuid": "^10.0.0"
+    "bull": "latest",
+    "chai-http": "latest",
+    "express": "latest",
+    "image-thumbnail": "latest",
+    "mime-types": "latest",
+    "mongodb": "latest",
+    "redis": "latest",
+    "sha1": "latest",
+    "uuid": "latest"
   },
   "devDependencies": {
-    "@babel/cli": "^7.24.7",
-    "@babel/core": "^7.24.7",
-    "@babel/node": "^7.24.7",
-    "@babel/preset-env": "^7.24.7",
-    "@babel/register": "^7.24.6",
-    "@eslint/js": "^9.6.0",
-    "chai": "^5.1.1",
-    "chai-http": "^5.0.0",
-    "dotenv": "^16.4.5",
-    "eslint": "^9.6.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jest": "^28.6.0",
-    "globals": "^15.8.0",
-    "mocha": "^10.5.2",
-    "nodemon": "^3.1.4",
-    "request": "^2.88.0",
-    "sinon": "^18.0.0"
+    "@babel/cli": "latest",
+    "@babel/core": "latest",
+    "@babel/node": "latest",
+    "@babel/preset-env": "latest",
+    "@babel/register": "latest",
+    "chai": "latest",
+    "chai-http": "latest",
+    "mocha": "latest",
+    "nodemon": "latest",
+    "eslint": "latest",
+    "eslint-config-airbnb-base": "latest",
+    "eslint-plugin-import": "latest",
+    "eslint-plugin-jest": "latest",
+    "request": "latest",
+    "sinon": "latest"
   }
 }
+
+
