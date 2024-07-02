@@ -32,16 +32,18 @@
     "@babel/node": "^7.24.7",
     "@babel/preset-env": "^7.24.7",
     "@babel/register": "^7.24.6",
+    "@eslint/js": "^9.6.0",
     "chai": "^5.1.1",
     "chai-http": "^5.0.0",
-    "eslint": "^8.2.0",
+    "dotenv": "^16.4.5",
+    "eslint": "^9.6.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jest": "^28.6.0",
+    "globals": "^15.8.0",
     "mocha": "^10.5.2",
     "nodemon": "^3.1.4",
     "request": "^2.88.0",
-    "sinon": "^18.0.0",
-    "dotenv": "^16.4.5"
+    "sinon": "^18.0.0"
   }
 }
