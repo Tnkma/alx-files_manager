@@ -39,6 +39,16 @@ class DBClient {
   async nbFiles() {
     return this.client.db(this.database).collection('files').countDocuments();
   }
+
+  // Method to get reference of the usercollection
+  async users() {
+    return this.client.db(this.database).collection('users');
+  }
+
+  // Method to get reference of the filescollection
+  async files() {
+    return this.client.db(this.database).collection('files');
+  }
 }
 
 // Create a new instance of the DBClient class

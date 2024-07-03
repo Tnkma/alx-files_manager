@@ -22,7 +22,7 @@
     "mime-types": "latest",
     "mongodb": "latest",
     "redis": "latest",
-    "sha1": "latest",
+    "sha1": "^1.1.1",
     "uuid": "latest"
   },
   "devDependencies": {
