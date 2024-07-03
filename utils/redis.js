@@ -1,67 +1,44 @@
-const redis = require('redis');
+import { createClient } from "redis";
 
 // create a redis class to handle all redis operations
 class RedisClient {
   constructor() {
     // initialize the redis client server connection
-    this.client = redis.createClient({
-      host: '127.0.0.1',
-      port: 6379,
+    this.client = createClient({
+      url: 'redis://127.0.0.1:6379'
     });
-
-    // Trying to connect to the redis server
-    // If we encounter an error, we will log it to the console
+    this.isconnected = true;
     this.client.on('error', (err) => {
-      console.error('Error connecting to the redis server:', err);
+      console.log(`Redis client not connected to the server: ${err}`);
     });
-
-    // If the connection is successful, we will log a success message to the console
-    this.client.on('connect', () => {
-      // console.log('Connected to the redis server');
-      this.connected = true;
-    });
+    this.isconnected = false;
+    this.client.connect();
+    this.isconnected = true;
   }
 
   // method to check if the connection is successful
   isAlive() {
-    const status = this.client.connected;
+    const status = this.client.isconnected;
     if (status) {
       return true;
+    } else {
+      return false;
     }
-    return false;
   }
 
   // takes a string key as argument and returns the Redis value stored for this key
   async get(key) {
-    // stimulate a promise to return the value
-    return new Promise((resolve, reject) => {
-      this.client.get(key, (err, value) => {
-        if (err) reject(err);
-        resolve(value);
-      });
-    });
+    return (await this.client).get(key);
   }
 
   // takes a string key, a value and a duration in second as arguments to store it in Redis
   async set(key, value, duration) {
-    // stimulate a promise to save the value in Redis
-    return new Promise((resolve, reject) => {
-      this.client.set(key, value, 'EX', duration, (err, value) => {
-        if (err) reject(err);
-        resolve(value);
-      });
-    });
+    return (await this.client).set(key, value, 'EX', duration)
   }
 
   // takes a string key as argument and deletes the value stored for this key in Redis
   async del(key) {
-    // stimulate a promise to delete the value in Redis
-    return new Promise((resolve, reject) => {
-      this.client.del(key, (err, value) => {
-        if (err) reject(err);
-        resolve(value);
-      });
-    });
+    return (await this.client).del(key);
   }
 }
 
