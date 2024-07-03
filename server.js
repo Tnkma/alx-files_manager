@@ -17,7 +17,7 @@ app.use('/', routes);
 
 // Were are we going to be listening for requests
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
 
 // Export the app

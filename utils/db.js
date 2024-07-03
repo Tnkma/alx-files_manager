@@ -1,5 +1,5 @@
-import enventLoader from './env';
 import { MongoClient } from 'mongodb';
+import enventLoader from './env';
 
 class DBClient {
   constructor() {
