@@ -7,15 +7,10 @@ class RedisClient {
     this.client = createClient({
       url: 'redis://127.0.0.1:6379'
     });
-    this.isconnected = true;
     this.client.on('error', (err) => {
       console.log(`Redis client not connected to the server: ${err}`);
-      this.isconnected = false;
     });
-    const getsta = this.client.connect();
-    if (getsta) {
-      this.isconnected = true;
-    }
+    this.client.connect();
   }
 
   // method to check if the connection is successful
@@ -30,7 +25,7 @@ class RedisClient {
 
   // takes a string key as argument and returns the Redis value stored for this key
   async get(key) {
-    return (await this.client).get(key);
+      return (await this.client).get(key);
   }
 
   // takes a string key, a value and a duration in second as arguments to store it in Redis
