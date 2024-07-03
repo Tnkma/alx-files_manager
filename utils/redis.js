@@ -10,15 +10,17 @@ class RedisClient {
     this.isconnected = true;
     this.client.on('error', (err) => {
       console.log(`Redis client not connected to the server: ${err}`);
+      this.isconnected = false;
     });
-    this.isconnected = false;
-    this.client.connect();
-    this.isconnected = true;
+    const getsta = this.client.connect();
+    if (getsta) {
+      this.isconnected = true;
+    }
   }
 
   // method to check if the connection is successful
   isAlive() {
-    const status = this.client.isconnected;
+    const status = this.client.isOpen;
     if (status) {
       return true;
     } else {
