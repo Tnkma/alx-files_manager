@@ -1,5 +1,6 @@
 import sha1 from 'sha1';
 import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 class UsersController {
   static async postNew(req, res) {
@@ -46,6 +47,22 @@ class UsersController {
 
     return res.status(201).json(userResponse);
   }
+
+  static async getMe(req, res) {
+    const token = req.headers['x-token'];
+
+      if (!token) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Retrieve user ID from Redis based on token
+      // i think redis stores this as a token and not user data
+      // lets see if dbclient can provide the data
+      const user = await redisClient.get(token);
+      console.log(user);
+    return res.status(200).json({ email: user.email, id: user._id.toString() });
+  }
 }
 
-export default UsersController;
+module.exports = UsersController;
+
