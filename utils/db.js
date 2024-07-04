@@ -1,9 +1,9 @@
-import { MongoClient } from 'mongodb';
-import enventLoader from './env';
+const { MongoClient } = require('mongodb');
+const eventLoader = require('./env');
 
 class DBClient {
   constructor() {
-    enventLoader();
+    eventLoader();
     // Set connection options for MongoDB
     const host = process.env.DB_HOST || 'localhost';
     const port = process.env.DB_PORT || '27017';
@@ -13,7 +13,7 @@ class DBClient {
     const url = `mongodb://${host}:${port}`;
     this.database = database;
     // Create a new MongoClient
-    this.client = new MongoClient(url, { useUnifiedTopology: true } );
+    this.client = new MongoClient(url, { useUnifiedTopology: true });
     this.connected = false;
 
     // Automatically connect upon instantiation
@@ -55,4 +55,4 @@ class DBClient {
 const dbClient = new DBClient();
 
 // Export the instance
-export default dbClient;
+module.exports = dbClient;

@@ -4,7 +4,7 @@ const { MongoClient } = require('mongodb');
 class DBClient {
   constructor() {
     const url = 'mongodb://localhost:27017';
-    this.client = new MongoClient(url);
+    this.client = new MongoClient(url, { useUnifiedTopology: true });
     this.dbName = 'myProject';
     this.connected = false;
   }
