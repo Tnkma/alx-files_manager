@@ -1,13 +1,15 @@
-import express from 'express';
-import routes from './routes';
-import enventLoader from './utils/env';
-
+const express = require('express');
+const routes = require('./routes');
+const envLoader = require('./utils/env');
+const redis = require('redis');
+const { MongoClient } = require('mongodb');
+const dbClient = require('./utils/db');
 // Load environment variables
-enventLoader();
+envLoader();
 
-// initialize express just like we do for flask
+// Initialize Express
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5002;
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
@@ -15,10 +17,30 @@ app.use(express.json());
 // Use routes defined in routes/index.js
 app.use('/', routes);
 
-// Were are we going to be listening for requests
+// Redis client setup
+const redisClient = redis.createClient({
+  host: '127.0.0.1',
+  port: 6379,
+});
+
+redisClient.on('error', (err) => {
+  console.error('Redis client error:', err);
+});
+
+// Access MongoDB collections via DBClient instance
+const dbClient = new DBClient();
+
+// route to check MongoDB connection status
+app.get('/status', (req, res) => {
+  const isConnected = dbClient.isAlive();
+  const response = {
+    mongodb: isConnected ? 'Connected' : 'Disconnected',
+  };
+  res.json(response);
+});
+
+// Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
-// Export the app
-export default app;

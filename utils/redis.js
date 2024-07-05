@@ -1,5 +1,5 @@
-import { promisify } from 'util';
-import { createClient } from 'redis';
+const { promisify } = require('util');
+const { createClient } = require('redis');
 
 class RedisClient {
   // Creates an instance of redis

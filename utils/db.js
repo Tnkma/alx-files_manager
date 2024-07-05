@@ -1,9 +1,8 @@
 const { MongoClient } = require('mongodb');
-const eventLoader = require('./env');
+require('dotenv').config(); 
 
 class DBClient {
   constructor() {
-    eventLoader();
     // Set connection options for MongoDB
     const host = process.env.DB_HOST || 'localhost';
     const port = process.env.DB_PORT || '27017';
@@ -40,12 +39,12 @@ class DBClient {
     return this.client.db(this.database).collection('files').countDocuments();
   }
 
-  // Method to get reference of the usercollection
+  // Method to get reference of the user collection
   async users() {
     return this.client.db(this.database).collection('users');
   }
 
-  // Method to get reference of the filescollection
+  // Method to get reference of the files collection
   async files() {
     return this.client.db(this.database).collection('files');
   }
@@ -56,3 +55,4 @@ const dbClient = new DBClient();
 
 // Export the instance
 module.exports = dbClient;
+
