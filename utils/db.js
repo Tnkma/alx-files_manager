@@ -20,8 +20,13 @@ class DBClient {
   }
 
   async connect() {
-    await this.client.connect();
-    this.connected = true;
+    try {
+      await this.client.connect();
+      this.connected = true;
+      console.log('Connected to MongoDB');
+    } catch (error) {
+      console.error('Failed to connect to MongoDB', error);
+    }
   }
 
   // Method to check if the connection is successful
@@ -31,21 +36,25 @@ class DBClient {
 
   // Method to get the number of users in the database
   async nbUsers() {
+    if (!this.connected) throw new Error('Not connected to the database');
     return this.client.db(this.database).collection('users').countDocuments();
   }
 
   // Method to get the number of files in the database
   async nbFiles() {
+    if (!this.connected) throw new Error('Not connected to the database');
     return this.client.db(this.database).collection('files').countDocuments();
   }
 
   // Method to get reference of the user collection
   async users() {
+    if (!this.connected) throw new Error('Not connected to the database');
     return this.client.db(this.database).collection('users');
   }
 
   // Method to get reference of the files collection
   async files() {
+    if (!this.connected) throw new Error('Not connected to the database');
     return this.client.db(this.database).collection('files');
   }
 }

@@ -2,8 +2,8 @@ const express = require('express');
 const routes = require('./routes');
 const envLoader = require('./utils/env');
 const redis = require('redis');
-const { MongoClient } = require('mongodb');
 const dbClient = require('./utils/db');
+
 // Load environment variables
 envLoader();
 
@@ -27,10 +27,11 @@ redisClient.on('error', (err) => {
   console.error('Redis client error:', err);
 });
 
-// Access MongoDB collections via DBClient instance
-const dbClient = new DBClient();
+redisClient.on('connect', () => {
+  console.log('Connected to Redis');
+});
 
-// route to check MongoDB connection status
+// Route to check MongoDB connection status
 app.get('/status', (req, res) => {
   const isConnected = dbClient.isAlive();
   const response = {
