@@ -51,18 +51,17 @@ class UsersController {
   static async getMe(req, res) {
     const token = req.headers['x-token'];
 
-      if (!token) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
 
-      // Retrieve user ID from Redis based on token
-      // i think redis stores this as a token and not user data
-      // lets see if dbclient can provide the data
-      const user = await redisClient.get(`auth_${token}`);
-      console.log(user);
+    // Retrieve user ID from Redis based on token
+    // i think redis stores this as a token and not user data
+    // lets see if dbclient can provide the data
+    const user = await redisClient.get(`auth_${token}`);
+    console.log(user);
     return res.status(200).json({ email: user.email, id: user._id.toString() });
   }
 }
 
 module.exports = UsersController;
-

@@ -1,15 +1,12 @@
-const express = require('express');
-const routes = require('./routes');
-const envLoader = require('./utils/env');
-const redis = require('redis');
-const dbClient = require('./utils/db');
+import express from 'express';
+import redis from 'redis';
+import routes from './routes';
+import dbClient from './utils/db';
 
 // Load environment variables
-envLoader();
-
 // Initialize Express
 const app = express();
-const port = process.env.PORT || 5002;
+const port = process.env.PORT || 5000;
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
@@ -44,4 +41,3 @@ app.get('/status', (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
