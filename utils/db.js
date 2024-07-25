@@ -1,58 +1,40 @@
-const { MongoClient } = require('mongodb');
-const eventLoader = require('./env');
+import { MongoClient } from 'mongodb';
+
+const host = process.env.DB_HOST || 'localhost';
+const port = process.env.DB_PORT || 27017;
+const database = process.env.DB_DATABASE || 'files_manager';
+const url = `mongodb://${host}:${port}`;
 
 class DBClient {
   constructor() {
-    eventLoader();
-    // Set connection options for MongoDB
-    const host = process.env.DB_HOST || 'localhost';
-    const port = process.env.DB_PORT || '27017';
-    const database = process.env.DB_DATABASE || 'files_manager';
-
-    // Set the connection string for MongoDB
-    const url = `mongodb://${host}:${port}`;
-    this.database = database;
-    // Create a new MongoClient
-    this.client = new MongoClient(url, { useUnifiedTopology: true });
-    this.connected = false;
-
-    // Automatically connect upon instantiation
-    this.connect().catch(console.error);
+    MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
+      if (!err) {
+        // console.log('Connected successfully to server');
+        this.db = client.db(database);
+        this.usersCollection = this.db.collection('users');
+        this.filesCollection = this.db.collection('files');
+      } else {
+        console.log(err.message);
+        this.db = false;
+      }
+    });
   }
 
-  async connect() {
-    await this.client.connect();
-    this.connected = true;
-  }
-
-  // Method to check if the connection is successful
   isAlive() {
-    return this.connected;
+    return Boolean(this.db);
   }
 
-  // Method to get the number of users in the database
   async nbUsers() {
-    return this.client.db(this.database).collection('users').countDocuments();
+    const numberOfUsers = this.usersCollection.countDocuments();
+    return numberOfUsers;
   }
 
-  // Method to get the number of files in the database
   async nbFiles() {
-    return this.client.db(this.database).collection('files').countDocuments();
-  }
-
-  // Method to get reference of the usercollection
-  async users() {
-    return this.client.db(this.database).collection('users');
-  }
-
-  // Method to get reference of the filescollection
-  async files() {
-    return this.client.db(this.database).collection('files');
+    const numberOfFiles = this.filesCollection.countDocuments();
+    return numberOfFiles;
   }
 }
 
-// Create a new instance of the DBClient class
 const dbClient = new DBClient();
 
-// Export the instance
-module.exports = dbClient;
+export default dbClient;
