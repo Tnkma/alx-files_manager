@@ -1,28 +1,26 @@
-const sha1 = require('sha1');
-const dbClient = require('../utils/db');
-const redisClient = require('../utils/redis');
+import sha1 from 'sha1';
+import Queue from 'bull';
+import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
+
+const queue = new Queue('queue');
 
 class UsersController {
   static async postNew(req, res) {
     const { email, password } = req.body;
 
-    // const checkdb = await dbClient.isAlive();
-    // if (checkdb) {
-    // console.log('DB is alive');
-    // }
-
-    // Check if email is provided
+    // Check if email is not provided
     if (!email) {
       return res.status(400).json({ error: 'Missing email' });
     }
 
-    // Check if password is provided
+    // Check if password is not provided
     if (!password) {
       return res.status(400).json({ error: 'Missing password' });
     }
 
     // Check if email already exists in DB
-    const user = await (await dbClient.users()).findOne({ email });
+    const user = await dbClient.usersCollection.findOne({ email });
     if (user) {
       return res.status(400).json({ error: 'Already exist' });
     }
@@ -37,7 +35,14 @@ class UsersController {
     };
 
     // Insert new user into DB
-    const result = await (await dbClient.users()).insertOne(newUser);
+    let result;
+    try {
+      result = await dbClient.usersCollection.insertOne(newUser);
+    } catch (err) {
+      await queue.add({});
+      return res.status(500).send({ error: 'Error creating user.' });
+    }
+    // const result = await dbClient.usersCollection.insertOne(newUser);
 
     // Return the new user with only the email and id
     const userResponse = {
@@ -45,7 +50,11 @@ class UsersController {
       email,
     };
 
-    return res.status(201).json(userResponse);
+    await queue.add({
+      userId: result.insertedId.toString(),
+    });
+
+    return res.status(201).send(userResponse);
   }
 
   static async getMe(req, res) {
