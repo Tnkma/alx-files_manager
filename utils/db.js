@@ -33,6 +33,10 @@ class DBClient {
     const numberOfFiles = this.filesCollection.countDocuments();
     return numberOfFiles;
   }
+
+  async getObjectId(id) {
+    return this.ObjectId(id);
+  }
 }
 
 const dbClient = new DBClient();

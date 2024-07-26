@@ -38,6 +38,8 @@ class UsersController {
     let result;
     try {
       result = await dbClient.usersCollection.insertOne(newUser);
+      // const newman = (await dbClient.usersCollection.findOne({ email, password: hashedPassword }));
+      // console.log(newman);
     } catch (err) {
       await queue.add({});
       return res.status(500).send({ error: 'Error creating user.' });
@@ -58,18 +60,29 @@ class UsersController {
   }
 
   static async getMe(req, res) {
-    const token = req.headers['x-token'];
+    const token = req.header('X-Token');
+    console.log(token);
 
-    if (!token) {
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+    const userKey = `auth_${token}`;
+    console.log(userKey);
+
+    const userId = await redisClient.get(userKey);
+    console.log(userId);
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    // Assuming _db.usersCollection is a MongoDB collection
+    const user = await dbClient.usersCollection.findOne({ _id: userId});
+
+    console.log(user);
+
+    if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-
-    // Retrieve user ID from Redis based on token
-    // i think redis stores this as a token and not user data
-    // lets see if dbclient can provide the data
-    const user = await redisClient.get(`auth_${token}`);
     console.log(user);
-    return res.status(200).json({ email: user.email, id: user._id.toString() });
+
+    // return res.status(200).json({ email: user.email, id: user._id.toString() });
   }
 }
 
