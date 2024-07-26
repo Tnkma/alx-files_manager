@@ -1,66 +1,51 @@
-const fs = require('fs');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
-const dbClient = require('../utils/db');
+import { ObjectId } from 'mongodb';
+import Queue from 'bull';
+import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
+import basicUtils from '../utils/basics';
 
 const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
 
-async function postUpload(req, res) {
-  try {
-    const token = req.headers['x-token'];
-    const { name, type, parentId = '0', isPublic = false, data } = req.body;
+const fileQueue = new Queue('fileQueue');
 
-    // Validate token
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
-    const user = await dbClient.usersCollection.findOne({ token });
-    if (!user) return res.status(401).json({ error: 'Unauthorized' });
+class FilesController {
+  static async postUpload(request, response) {
+    const obj = { userId: null, key: null };
+    const token = request.header('X-Token');
+    // console.log(token);
+    if (!token) return response.status(401).json({ error: 'Unauthorized' });
 
-    // Validate input
-    if (!name) return res.status(400).json({ error: 'Missing name' });
-    if (!['folder', 'file', 'image'].includes(type)) return res.status(400).json({ error: 'Invalid type' });
-    if (type !== 'folder' && !data) return res.status(400).json({ error: 'Missing data' });
+    obj.key = `auth_${token}`;
+    obj.userId = await redisClient.get(obj.key);
 
-    // Validate parentId
-    if (parentId !== '0') {
-      const parent = await dbClient.filesCollection.findOne({ _id: new dbClient.ObjectID(parentId) });
-      if (!parent) return res.status(400).json({ error: 'Parent not found' });
-      if (parent.type !== 'folder') return res.status(400).json({ error: 'Parent is not a folder' });
+    if (!obj.userId) return response.status(401).json({ error: 'Unauthorized thee' });
+
+    if (!basicUtils.isValidId(obj.userId)) return response.status(401).send({ error: 'Unauthorized here' });
+
+    const user = await dbClient.usersCollection.findOne({ _id: ObjectId(obj.userId) });
+    if (!user) return response.status(401).send({ error: 'Unauthorized get' });
+
+    const { error: validationError, fileParams } = await basicUtils.validateBody(request);
+    if (validationError) return response.status(400).send({ error: validationError });
+
+    if (fileParams.parentId !== 0 && !basicUtils.isValidId(fileParams.parentId)) {
+      return response.status(400).send({ error: 'Parent not found' });
     }
 
-    // Create new file document
-    const fileDoc = {
-      userId: user._id,
-      name,
-      type,
-      isPublic,
-      parentId,
-    };
-
-    if (type === 'folder') {
-      await dbClient.filesCollection.insertOne(fileDoc);
-      return res.status(201).json(fileDoc);
+    const { error, code, newFile } = await basicUtils.saveFile(obj.userId, fileParams, FOLDER_PATH);
+    if (error) {
+      if (request.body.type === 'image') await fileQueue.add({ userId: obj.userId });
+      return response.status(code).send({ error });
     }
 
-    // Create directory if it doesn't exist
-    if (!fs.existsSync(FOLDER_PATH)) {
-      fs.mkdirSync(FOLDER_PATH, { recursive: true });
+    if (fileParams.type === 'image') {
+      await fileQueue.add({
+        fileId: newFile.id.toString(),
+        userId: newFile.userId.toString(),
+      });
     }
 
-    // Save file data to disk
-    const filePath = path.join(FOLDER_PATH, uuidv4());
-    fs.writeFileSync(filePath, Buffer.from(data, 'base64'));
-
-    // Add file path to document
-    fileDoc.localPath = filePath;
-    await dbClient.filesCollection.insertOne(fileDoc);
-
-    res.status(201).json(fileDoc);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    return response.status(201).send(newFile);
   }
 }
-
-module.exports = {
-  postUpload,
-};
+module.exports = FilesController;
