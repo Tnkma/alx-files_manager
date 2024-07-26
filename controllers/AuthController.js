@@ -49,15 +49,11 @@ class AuthController {
   // Sign-out user and delete token
   static async getDisconnect(req, res) {
     try {
-
       const token = req.header('X-Token');
 
       if (!token) return res.status(401).json({ error: 'Unauthorized' });
 
       const key = `auth_${token}`;
-
-      // obj.userId = await redisClient.get(obj.key);
-
       // Delete token in Redis
       await redisClient.del(key);
 
