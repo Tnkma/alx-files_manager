@@ -54,6 +54,8 @@ class AuthController {
       if (!token) return res.status(401).json({ error: 'Unauthorized' });
 
       const key = `auth_${token}`;
+      // Check if token exits in Redis
+      if (!(await redisClient.get(key))) return res.status(401).json({ error: 'Unauthorized' });
       // Delete token in Redis
       await redisClient.del(key);
 
