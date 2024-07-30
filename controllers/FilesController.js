@@ -84,14 +84,9 @@ class FilesController {
       const parentId = request.query.parentId || '0';
       const page = parseInt(request.query.page, 10) || 0;
 
-      if (!parentId) return response.status(200).send([]);
-      if (!page) return response.status(200).send([]);
-
-      if (!basicUtils.isValidId(parentId) || !basicUtils.isValidId(user)) {
-        return response.status(200).send([]);
-      }
-      if (basicUtils.isValidId(parentId || !page)) {
-        return response.status(200).send([]);
+      // Validation for parentId
+      if (parentId !== '0' && !ObjectId.isValid(parentId)) {
+        return response.status(400).json({ error: 'Invalid parentId' });
       }
 
       // Pagination logic
@@ -104,10 +99,6 @@ class FilesController {
       };
 
       if (parentId !== '0') {
-        // Check if parentId is a valid ObjectId
-        if (!ObjectId.isValid(parentId)) {
-          return response.status(200).send([]); // Return empty list if invalid
-        }
         matchQuery.parentId = ObjectId(parentId);
       }
 
