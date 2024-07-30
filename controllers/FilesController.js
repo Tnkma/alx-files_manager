@@ -84,6 +84,16 @@ class FilesController {
       const parentId = request.query.parentId || '0';
       const page = parseInt(request.query.page, 10) || 0;
 
+      if (!parentId) return response.status(200).send([]);
+      if (!page) return response.status(200).send([]);
+
+      if (!basicUtils.isValidId(parentId) || !basicUtils.isValidId(user)) {
+        return response.status(200).send([]);
+      }
+      if (basicUtils.isValidId(parentId || !page)) {
+        return response.status(200).send([]);
+      }
+
       // Pagination logic
       const pageSize = 20;
       const skip = page * pageSize;
