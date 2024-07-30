@@ -18,7 +18,7 @@ class FilesController {
     obj.key = `auth_${token}`;
     obj.userId = await redisClient.get(obj.key);
 
-    if (!obj.userId) return response.status(401).json({ error: 'Unauthorized thee' });
+    if (!obj.userId) return response.status(401).json({ error: 'Unauthorized' });
 
     if (!basicUtils.isValidId(obj.userId)) return response.status(401).send({ error: 'Unauthorized here' });
 
