@@ -115,5 +115,75 @@ class FilesController {
       return response.status(500).json({ error: 'Internal Server Error' });
     }
   }
+
+  static async putPublish(request, response) {
+    try {
+      // Get user based on token
+      const token = request.header('X-Token');
+      if (!token) return response.status(401).json({ error: 'Unauthorized' });
+
+      // Get user ID from Redis
+      const user = await redisClient.get(`auth_${token}`);
+      if (!user) return response.status(401).json({ error: 'Unauthorized' });
+
+      // Get file ID from request parameters
+      const fileId = request.params.id;
+      if (!ObjectId.isValid(fileId)) return response.status(404).json({ error: 'Not found' });
+
+      // Find the file document
+      const file = await dbClient.filesCollection.findOne({
+        _id: ObjectId(fileId),
+        userId: ObjectId(user),
+      });
+      if (!file) return response.status(404).json({ error: 'Not found' });
+
+      // Update the file's isPublic field
+      const updatedFile = await dbClient.filesCollection.findOneAndUpdate(
+        { _id: ObjectId(fileId) },
+        { $set: { isPublic: true } },
+        { returnDocument: 'after' },
+      );
+
+      // Return the updated file document
+      return response.status(200).json(updatedFile.value);
+    } catch (error) {
+      return response.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
+  static async putUnpublish(request, response) {
+    try {
+      // Get user based on token
+      const token = request.header('X-Token');
+      if (!token) return response.status(401).json({ error: 'Unauthorized' });
+
+      // Get user ID from Redis
+      const user = await redisClient.get(`auth_${token}`);
+      if (!user) return response.status(401).json({ error: 'Unauthorized' });
+
+      // Get file ID from request parameters
+      const fileId = request.params.id;
+      if (!ObjectId.isValid(fileId)) return response.status(404).json({ error: 'Not found' });
+
+      // Find the file document
+      const file = await dbClient.filesCollection.findOne({
+        _id: ObjectId(fileId),
+        userId: ObjectId(user),
+      });
+      if (!file) return response.status(404).json({ error: 'Not found' });
+
+      // Update the file's isPublic field
+      const updatedFile = await dbClient.filesCollection.findOneAndUpdate(
+        { _id: ObjectId(fileId) },
+        { $set: { isPublic: false } },
+        { returnDocument: 'after' },
+      );
+
+      // Return the updated file document
+      return response.status(200).json(updatedFile.value);
+    } catch (error) {
+      return response.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
 }
 module.exports = FilesController;
